@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${shelter != null} ? ${shelter.name} + ' - Animals' : 'Shelter Animals'">Shelter Animals</title>
+</head>
+<body>
+<header>
+    <h1 th:text="${shelter != null} ? ${shelter.name} : 'Shelter'">Shelter</h1>
+</header>
+
+<section>
+    <div th:if="${animals == null or #lists.isEmpty(animals)}">
+        <p>No animals found.</p>
+    </div>
+
+    <div th:if="${animals != null and !#lists.isEmpty(animals)}">
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Species</th>
+                <th>Age</th>
+                <th>Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="animal : ${animals}">
+                <td th:text="${animal.name}">Name</td>
+                <td th:text="${animal.species}">Species</td>
+                <td th:text="${animal.breed}">Breed</td>
+                <td th:text="${(animal.ageYears != null ? animal.ageYears : 0) + 'y ' + (animal.ageMonths != null ? animal.ageMonths : 0) + 'm'}">Age</td>
+                <td th:text="${animal.sex}">Sex</td>
+
+                <td>
+                    <span th:if="${animal.accepted}" class="badge bg-success">Accepted</span>
+                    <span th:if="${!animal.accepted}" class="badge bg-secondary">Not yet accepted</span>
+                </td>
+
+                <td>
+                    <a th:href="@{/animal/{id}(id=${animal.id})}" target="_blank">Visit profile</a>
+                </td>
+            </tr>
+            <!--
+            <tr th:each="a : ${animals}">
+                <td th:text="${a.name}">Name</td>
+                <td th:text="${a.species}">Species</td>
+                <td th:text="${a.ageYears}">Age</td>
+                <td>
+                    <a th:href="@{/animals/{id}(id=${a.id})}">View</a>
+                </td>
+            </tr>
+            -->
+            </tbody>
+        </table>
+    </div>
+</section>
+
+</body>
+</html>

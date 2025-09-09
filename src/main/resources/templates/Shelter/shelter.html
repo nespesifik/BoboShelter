@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{page_layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Shelter</title>
+</head>
+<body>
+<div layout:fragment="main-content">
+    <form th:action="@{/shelter/{id}(id=${id})}" th:object="${shelter}" method="post">
+
+        <!-- Keep the ID during post-back -->
+        <input type="hidden" th:field="*{id}"/>
+
+        <!-- Disable all fields for admins -->
+        <!--
+        <fieldset th:disabled="${#authorization.expression('hasAnyRole(''ADMIN'',''VET'',''VISITOR'')')}">
+        -->
+        <fieldset th:disabled="${((#authentication?.principal?.userType?.name() == 'SHELTER')
+        and (#authentication?.principal?.userId != id))
+        or
+        (#authentication?.principal?.userType?.name() != 'SHELTER')}">
+
+        <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" class="form-control" th:field="*{name}">
+                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" class="form-control" th:field="*{address}">
+                <span th:if="${#fields.hasErrors('address')}" th:errors="*{address}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" class="form-control" th:field="*{city}">
+                <span th:if="${#fields.hasErrors('city')}" th:errors="*{city}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" class="form-control" th:field="*{phone}">
+                <span th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="error"></span>
+            </div>
+
+            <!-- Authorization status badge -->
+            <div class="form-group">
+                <label>Status</label>
+                <span class="badge bg-success" th:if="${shelter != null and shelter.authorized}">Authorized</span>
+                <span class="badge bg-danger" th:if="${shelter == null or !shelter.authorized}">Not authorized</span>
+            </div>
+
+        </fieldset>
+
+        <button type="submit" class="btn btn-primary"
+                th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                th:text="${shelter.authorized} ? 'Unauthorize' : 'Authorize'">
+        </button>
+
+        <button type="submit" class="btn btn-primary"
+                th:if="${(#authentication?.principal?.userType?.name() == 'SHELTER')
+                        and (#authentication?.principal?.userId == id)}">
+            Submit
+        </button>
+    </form>
+</div>
+
+</body>
+</html>

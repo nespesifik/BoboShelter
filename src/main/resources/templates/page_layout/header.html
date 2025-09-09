@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<header class="masthead mb-auto" th:fragment="header">
+    <div class="inner">
+        <nav class="nav nav-masthead justify-content-center">
+            <a class="nav-link"
+               sec:authorize="hasRole('ADMIN')"
+               th:href="@{/vet}">
+                Vets
+            </a>
+
+            <a class="nav-link"
+               sec:authorize="hasRole('ADMIN')"
+               th:href="@{/shelter}">
+                Shelters
+            </a>
+        <span class="d-inline-flex gap-2 ms-3" sec:authorize="isAuthenticated() and !hasRole('ADMIN')">
+            <a class="nav-link"
+               sec:authorize="isAuthenticated()"
+               th:href="@{/vet/{id}(id=${#authentication?.principal?.userId})}"
+               th:if="${(#authentication?.principal instanceof T(gr.hua.dit.ds.shelter.service.CustomUserDetails))
+                       and (#authentication.principal.userType == T(gr.hua.dit.ds.shelter.entities.UserType).VET)}">
+                Profile
+            </a>
+
+            <a class="nav-link"
+               sec:authorize="hasRole('VET')"
+               th:href="@{/vet/{id}/animals(id=${#authentication?.principal?.userId})}">
+                View Animals
+            </a>
+            <!--
+            <a class="nav-link" href="/vet-portal"
+               sec:authorize="isAuthenticated()"
+               th:if="${(#authentication?.principal instanceof T(gr.hua.dit.ds.shelter.service.CustomUserDetails))
+                       and (#authentication.principal.userType == T(gr.hua.dit.ds.shelter.entities.UserType).VET)}">
+                Profile
+            </a>
+            -->
+            <!-- Visitor -->
+            <a class="nav-link"
+               sec:authorize="isAuthenticated()"
+               th:href="@{/visitor/{id}(id=${#authentication?.principal?.userId})}"
+               th:if="${(#authentication?.principal instanceof T(gr.hua.dit.ds.shelter.service.CustomUserDetails))
+                       and (#authentication.principal.userType == T(gr.hua.dit.ds.shelter.entities.UserType).VISITOR)}">
+                Profile
+            </a>
+
+            <a class="nav-link"
+               sec:authorize="hasRole('VISITOR')"
+               th:href="@{/visitor/{id}/search-animals(id=${#authentication?.principal?.userId})}">
+                Search Animals
+            </a>
+
+            <a class="nav-link"
+               sec:authorize="hasRole('VISITOR')"
+               th:href="@{/visitor/{id}/animals(id=${#authentication?.principal?.userId})}">
+                Animals To Visit
+            </a>
+
+            <a class="nav-link"
+               sec:authorize="isAuthenticated()"
+               th:href="@{/shelter/{id}(id=${#authentication?.principal?.userId})}"
+               th:if="${(#authentication?.principal instanceof T(gr.hua.dit.ds.shelter.service.CustomUserDetails))
+                    and (#authentication.principal.userType == T(gr.hua.dit.ds.shelter.entities.UserType).SHELTER)}">
+                Profile
+            </a>
+
+            <a class="nav-link"
+               sec:authorize="hasRole('SHELTER')"
+               th:href="@{/animal/new}">
+                Insert Animal
+            </a>
+
+            <a class="nav-link"
+               sec:authorize="hasRole('SHELTER')"
+               th:href="@{/shelter/{id}/animals(id=${#authentication?.principal?.userId})}">
+                My Animals
+            </a>
+
+            <a class="nav-link"
+               sec:authorize="hasRole('SHELTER')"
+               th:href="@{/shelter/{id}/pending_animals(id=${#authentication?.principal?.userId})}">
+                Pending Animals
+            </a>
+
+        </span>
+
+            <!-- Auth links -->
+            <span class="d-inline-flex" sec:authorize="!isAuthenticated()">
+                <a class="nav-link" href="/login">Login</a>
+                <a class="nav-link" href="/register">Register</a>
+            </span>
+
+            <span class="d-inline-flex gap-2 ms-3" sec:authorize="isAuthenticated()">
+                <form class="mb-0" th:action="@{/logout}" method="post">
+                    <input type="submit" class="btn btn-primary" value="Sign Out"/>
+                </form>
+            </span>
+
+            <!--
+            <span class="d-inline-flex gap-2 ms-3" sec:authorize="isAuthenticated()">
+                <form th:action="@{/logout}" method="post">
+                    <input type="submit" class="btn btn-primary" value="Sign Out"/>
+                </form>
+            </span>
+            -->
+        </nav>
+    </div>
+</header>
+</body>
+</html>

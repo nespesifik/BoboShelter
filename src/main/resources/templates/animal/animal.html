@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      layout:decorate="~{page_layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Animal</title>
+</head>
+<body>
+<div layout:fragment="main-content">
+    <form th:action="${animal.id} != null ? @{/animal/{id}(id=${animal.id})} : @{/animal/new}"
+          th:object="${animal}" method="post">
+        <!-- Keep the ID during post-back -->
+        <input type="hidden" th:field="*{id}"/>
+        <!-- Always submit current 'accepted' value (silent) -->
+        <input type="hidden" th:field="*{accepted}"/>
+
+        <!-- Disable all fields for admins/Vets/Visitors -->
+        <fieldset th:disabled="${#authorization.expression('hasAnyRole(''ADMIN'',''VET'',''VISITOR'')')}">
+
+        <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" class="form-control" th:field="*{name}">
+                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="species">Species</label>
+                <input type="text" id="species" class="form-control" th:field="*{species}">
+                <span th:if="${#fields.hasErrors('species')}" th:errors="*{species}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="breed">Breed</label>
+                <input type="text" id="breed" class="form-control" th:field="*{breed}">
+                <span th:if="${#fields.hasErrors('breed')}" th:errors="*{breed}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="ageYears">Age (Years)</label>
+                <input type="number" id="ageYears" class="form-control" min="0" max="60" th:field="*{ageYears}">
+                <span th:if="${#fields.hasErrors('ageYears')}" th:errors="*{ageYears}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="ageMonths">Age (Months)</label>
+                <input type="number" id="ageMonths" class="form-control" min="0" max="11" th:field="*{ageMonths}">
+                <span th:if="${#fields.hasErrors('ageMonths')}" th:errors="*{ageMonths}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="sex">Sex</label>
+                <select id="sex" class="form-control" th:field="*{sex}">
+                    <option th:each="s : ${T(gr.hua.dit.ds.shelter.entities.Animal.Sex).values()}"
+                            th:value="${s}" th:text="${s}"></option>
+                </select>
+                <span th:if="${#fields.hasErrors('sex')}" th:errors="*{sex}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" class="form-control" th:field="*{status}">
+                    <option th:each="st : ${T(gr.hua.dit.ds.shelter.entities.Animal.Status).values()}"
+                            th:value="${st}" th:text="${st}"></option>
+                </select>
+                <span th:if="${#fields.hasErrors('status')}" th:errors="*{status}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" class="form-check-input" th:field="*{vaccinated}">
+                    Vaccinated
+                </label>
+                <span th:if="${#fields.hasErrors('vaccinated')}" th:errors="*{vaccinated}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" class="form-check-input" th:field="*{neutered}">
+                    Neutered
+                </label>
+                <span th:if="${#fields.hasErrors('neutered')}" th:errors="*{neutered}" class="error"></span>
+            </div>
+
+            <div class="form-group" sec:authorize="hasRole('SHELTER')">
+                <label for="photoUrl">Photo URL</label>
+                <input type="url" id="photoUrl" class="form-control" th:field="*{photoUrl}">
+                <span th:if="${#fields.hasErrors('photoUrl')}" th:errors="*{photoUrl}" class="error"></span>
+            </div>
+
+            <div class="mt-2" th:if="${animal.photoUrl != null and !#strings.isEmpty(animal.photoUrl)}">
+                <img th:src="${animal.photoUrl}" alt="Animal photo preview"
+                     style="max-width: 300px; height: auto; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+
+            .<div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" class="form-control" rows="4" th:field="*{description}"></textarea>
+                <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></span>
+            </div>
+
+
+        </fieldset>
+
+        <!-- Hide the submit button for admins -->
+        <button type="submit" class="btn btn-primary"
+                th:if="${#authorization.expression('hasRole(''SHELTER'')')}">
+            Submit
+        </button>
+
+        <button type="submit" class="btn btn-primary"
+                th:if="${#authorization.expression('hasRole(''VISITOR'')')}"
+                th:text="${animal.requestToBeVisited} ? 'Cancel Visit' : 'Visit'">
+        </button>
+
+        <button type="submit" class="btn btn-primary"
+                th:if="${#authorization.expression('hasRole(''VET'')')}"
+                th:text="${animal.isAccepted()} ? 'Do Not Accept' : 'Accept'">
+        </button>
+    </form>
+</div>
+
+</body>
+</html>

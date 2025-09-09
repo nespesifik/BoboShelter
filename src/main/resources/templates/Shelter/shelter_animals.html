@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      layout:decorate="~{page_layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Shelter animals</title>
+</head>
+<body>
+<div layout:fragment="main-content">
+    <h1 th:text="${'Animals' + (shelter != null and shelter.name != null ? ' - ' + shelter.name : '')}">Animals</h1>
+    <!--
+    <h1 th:text="'Animals' + (${shelter} != null && ${shelter.name} != null ? ' - ' + ${shelter.name} : '')">Animals</h1>
+    -->
+    <!--
+        <p>
+        <a th:href="@{/shelter/{id}(id=${id})}">Back to shelter</a>
+    </p>
+    -->
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Species</th>
+            <th>Breed</th>
+            <th>Age</th>
+            <th>Sex</th>
+
+            <th>Accepted</th>
+
+            <th>Visit Profile</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="animal : ${animals}">
+            <td th:text="${animal.name}">Name</td>
+            <td th:text="${animal.species}">Species</td>
+            <td th:text="${animal.breed}">Breed</td>
+            <td th:text="${(animal.ageYears != null ? animal.ageYears : 0) + 'y ' + (animal.ageMonths != null ? animal.ageMonths : 0) + 'm'}">Age</td>
+            <td th:text="${animal.sex}">Sex</td>
+
+            <td>
+                <span th:if="${animal.accepted}" class="badge bg-success">Accepted</span>
+                <span th:if="${!animal.accepted}" class="badge bg-secondary">Not yet accepted</span>
+            </td>
+
+            <td>
+                <a th:href="@{/animal/{id}(id=${animal.id})}" target="_blank">Visit profile</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

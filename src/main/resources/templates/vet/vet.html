@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{page_layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Vet</title>
+</head>
+<body>
+<div layout:fragment="main-content">
+    <form th:action="@{/vet/{id}(id=${id})}" th:object="${vet}" method="post">
+
+        <!-- Keep the ID during post-back -->
+        <input type="hidden" th:field="*{id}"/>
+
+        <!-- Disable all fields for admins -->
+        <fieldset th:disabled="${#authorization.expression('hasRole(''ADMIN'')')}">
+
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" class="form-control" th:field="*{firstName}">
+                <span th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" class="form-control" th:field="*{lastName}">
+                <span th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="ID">Doctor ID</label>
+                <input type="text" id="ID" class="form-control" th:field="*{identificationNumber}">
+                <span th:if="${#fields.hasErrors('identificationNumber')}" th:errors="*{identificationNumber}" class="error"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+                <span th:if="${vet != null and vet.authorized}" class="badge bg-success">Authorized</span>
+                <span th:if="${vet == null or !vet.authorized}" class="badge bg-danger">Not authorized</span>
+            </div>
+
+        </fieldset>
+
+        <!-- Hide the submit button for admins -->
+        <button type="submit" class="btn btn-primary"
+                th:if="${!#authorization.expression('hasRole(''ADMIN'')')}">
+            Submit
+        </button>
+
+        <button type="submit" class="btn btn-primary"
+                th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+                th:text="${vet.authorized} ? 'Unauthorize' : 'Authorize'">
+        </button>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{page_layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Requested Animals</title>
+</head>
+<body>
+<div layout:fragment="main-content">
+    <div th:if="${not #lists.isEmpty(animals)}">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Shelter</th>
+                <th>Visit Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="animal : ${animals}">
+                <td th:text="${animal.name}">Name</td>
+                <td th:text="${animal.species}">Type</td>
+                <td>
+                    <a th:if="${animal.shelter != null}"
+                       th:href="@{/shelter/{id}(id=${animal.shelter.userShelter.id})}"
+                       th:text="${animal.shelter.name}">Shelter</a>
+                    <span th:if="${animal.shelter == null}">-</span>
+                </td>
+                <td>
+                    <span th:if="${animal.toBeVisited}" class="badge bg-success">Approved</span>
+                    <span th:if="${!animal.toBeVisited}" class="badge bg-warning text-dark">Pending</span>
+                </td>
+                <td>
+                    <a class="btn btn-outline-primary btn-sm"
+                       th:href="@{'/animal/' + ${animal.id}}">Details</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${#lists.isEmpty(animals)}">
+        No animals found!
+    </div>
+    <!--
+    <a th:href="@{/visitor/{id}(id=${id})}" class="btn btn-secondary mt-2" role="button">Back to Profile</a>
+    -->
+</div>
+</body>
+</html>

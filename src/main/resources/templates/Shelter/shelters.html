@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{page_layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Shelters</title>
+</head>
+<body>
+<div layout:fragment="main-content">
+    <h1>Shelters</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>City</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Responsible Vet</th>
+            <th>Visit Profile</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${shelters}">
+            <td th:text="${s.name}">Name</td>
+            <td th:text="${s.city}">City</td>
+            <td th:text="${s.phone}">Phone</td>
+
+            <!-- Authorized badge -->
+            <td>
+                <span th:if="${s.authorized}" class="badge bg-success">Accepted</span>
+                <span th:if="${!s.authorized}" class="badge bg-danger">Not accepted</span>
+            </td>
+
+            <!-- Vet (if assigned) -->
+            <td>
+                <span th:if="${s.vet != null}"
+                      th:text="${(s.vet.firstName != null ? s.vet.firstName : '') + ' ' + (s.vet.lastName != null ? s.vet.lastName : '')}">
+                    Vet Name
+                </span>
+                <span th:if="${s.vet == null}">—</span>
+            </td>
+
+            <!-- Profile link (uses shelter's user id) -->
+            <td>
+                <a th:if="${s.userShelter != null}"
+                   th:href="@{/shelter/{id}(id=${s.userShelter.id})}"
+                   target="_blank">Visit profile</a>
+                <span th:if="${s.userShelter == null}">—</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

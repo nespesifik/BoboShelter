@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{page_layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Search Animals</title>
+    <style>
+        .thumb {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+        }
+        .thumb-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #6c757d;
+            background: #f1f3f5;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="main-content">
+    <div th:if="${not #lists.isEmpty(animals)}">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Photo</th>
+                <th>Name</th>
+                <th>Species</th>
+                <th>Breed</th>
+                <th>Age</th>
+                <th>Sex</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="animal : ${animals}"
+                th:if="${animal.status == T(gr.hua.dit.ds.shelter.entities.Animal.Status).AVAILABLE}">
+                <td>
+                    <img th:if="${animal.photoUrl != null and !#strings.isEmpty(animal.photoUrl)}"
+                         th:src="${animal.photoUrl}" alt="photo" class="thumb">
+                    <span th:if="${animal.photoUrl == null or #strings.isEmpty(animal.photoUrl)}"
+                          class="thumb-placeholder" title="No photo">🐾</span>
+                </td>
+                <td th:text="${animal.name}"></td>
+                <td th:text="${animal.species}"></td>
+                <td th:text="${animal.breed}"></td>
+                <td>
+                    <span th:text="${animal.ageYears != null ? animal.ageYears : 0}"></span>y
+                    <span th:text="${animal.ageMonths != null ? animal.ageMonths : 0}"></span>m
+                </td>
+                <td th:text="${animal.sex}"></td>
+                <td>
+                    <a class="btn btn-outline-info btn-sm"
+                       th:href="@{'/animal/' + ${animal.id}}">Details</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${#lists.isEmpty(animals)}">
+        No animals found!
+    </div>
+</div>
+</body>
+</html>

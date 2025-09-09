@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      layout:decorate="~{page_layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Vets</title>
+</head>
+<body>
+<div layout:fragment="main-content">
+    <h1>Vets</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Responsible Shelters</th>
+            <th sec:authorize="hasAuthority('ROLE_ADMIN')">Assign Additional Shelter</th>
+            <th>Visit Profile</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="vet : ${vets}">
+            <!-- Name -->
+            <td th:text="${(vet.firstName != null ? vet.firstName : '') + ' ' + (vet.lastName != null ? vet.lastName : '')}">Name</td>
+
+            <!-- Already assigned shelters -->
+            <td>
+                <span th:if="${vet.shelterVet == null or #lists.isEmpty(vet.shelterVet)}">—</span>
+                <ul th:if="${vet.shelterVet != null and !#lists.isEmpty(vet.shelterVet)}" style="margin: 0; padding-left: 1rem;">
+                    <li th:each="sh : ${vet.shelterVet}" th:text="${sh.name}">Shelter Name</li>
+                </ul>
+            </td>
+
+            <!-- Admin-only: dropdown with remaining shelters and assign button -->
+            <td sec:authorize="hasAuthority('ROLE_ADMIN')">
+                <form th:action="@{/vet/{id}/assign-shelter(id=${vet.id})}" method="post" style="display: inline-flex; gap: .5rem; align-items: center;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <select name="shelterId" required>
+                        <option value="" disabled selected>Select shelter</option>
+                        <!-- Show shelters not already assigned to this vet -->
+                        <option th:each="s : ${shelters}"
+                                th:if="${vet.shelterVet == null
+                                    or #lists.isEmpty(vet.shelterVet)
+                                    or !#lists.contains(vet.shelterVet, s)}"
+                                th:value="${s.id}"
+                                th:text="${s.name}">Shelter Name</option>
+                    </select>
+
+                    <button type="submit" class="btn btn-secondary"
+                            th:disabled="${vet.authorized == null or !vet.authorized}">
+                        Assign
+                    </button>
+
+                </form>
+            </td>
+
+            <!-- Profile link -->
+            <td>
+                <a th:href="@{/vet/{id}(id=${vet.userVet.id})}" target="_blank">Visit profile</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

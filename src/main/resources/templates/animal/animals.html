@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Animals</title>
+</head>
+<body>
+<h1>Animals</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Species</th>
+        <th>Breed</th>
+        <th>Age</th>
+        <th>Sex</th>
+        <th sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_SHELTER','ROLE_VET')">Accepted</th>
+        <th>Visit Profile</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="animal : ${animals}">
+        <td th:text="${animal.name}">Name</td>
+        <td th:text="${animal.species}">Species</td>
+        <td th:text="${animal.breed}">Breed</td>
+        <td th:text="${(animal.ageYears != null ? animal.ageYears : 0) + 'y ' + (animal.ageMonths != null ? animal.ageMonths : 0) + 'm'}">Age</td>
+        <td th:text="${animal.sex}">Sex</td>
+        <td sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_SHELTER','ROLE_VET')">
+            <input type="checkbox" th:checked="${animal.accepted}" disabled>
+        </td>
+        <td>
+            <a th:href="@{/animal/{id}(id=${animal.id})}" target="_blank">Visit profile</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      layout:decorate="~{page_layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pending Animals</title>
+</head>
+<body>
+<div layout:fragment="main-content">
+    <h1 th:text="${'Animals Pending to be Visited' + (shelter != null and shelter.name != null ? ' - ' + shelter.name : '')}">
+        Animals Pending to be Visited
+    </h1>
+    <div th:if="${#lists.isEmpty(rows)}" class="alert alert-info" role="alert">
+        No pending visit requests.
+    </div>
+    <div th:if="${!#lists.isEmpty(rows)}">
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Species</th>
+            <th>Breed</th>
+            <th>Age</th>
+            <th>Sex</th>
+            <th>Visitor</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="row : ${rows}">
+            <!-- Animal fields -->
+            <td th:text="${row.animal.name}">Name</td>
+            <td th:text="${row.animal.species}">Species</td>
+            <td th:text="${row.animal.breed}">Breed</td>
+            <td th:text="${(row.animal.ageYears != null ? row.animal.ageYears : 0) + 'y ' + (row.animal.ageMonths != null ? row.animal.ageMonths : 0) + 'm'}">
+                Age
+            </td>
+            <td th:text="${row.animal.sex}">Sex</td>
+
+            <!-- Visitor info: safely handle null -->
+            <td>
+                <span th:if="${row.visitor != null}">
+                    <!-- Replace displayed fields as needed -->
+                    <span th:text="${row.visitor.id}">Visitor ID</span>
+                </span>
+                <span th:if="${row.visitor == null}" class="text-muted">Unassigned</span>
+            </td>
+
+            <!-- Actions -->
+            <td>
+                <a th:href="@{/animal/{id}(id=${row.animal.id})}" target="_blank">Visit animal profile</a>
+                <span th:if="${row.visitor != null and row.visitor.userVisitor != null}"> | </span>
+                <a th:href="@{/visitor/{id}(id=${row.userid})}"
+                   target="_blank">Visit visitor profile</a>
+                <!--
+                <span th:if="${row.visitor == null or row.visitor.userVisitor == null}" class="text-muted"> | No visitor user</span>
+                -->
+
+                <span th:if="${(row.animal.toBeVisited == null or !row.animal.toBeVisited)
+                   and (row.visitor != null and row.visitor.userVisitor != null)}"> | </span>
+                <a class="btn btn-sm btn-success"
+                   th:if="${(row.animal.toBeVisited == null or !row.animal.toBeVisited)
+                and (row.visitor != null and row.visitor.userVisitor != null)}"
+                   th:href="@{/shelter/{iduser}/acceptAnimalVisit/{idanim}(iduser=${id}, idanim=${row.animal.id})}">
+                    Accept visit
+                </a>
+                <span th:if="${(row.animal.toBeVisited == null or !row.animal.toBeVisited)
+                   and (row.visitor != null and row.visitor.userVisitor != null)}"> </span>
+                <a class="btn btn-sm btn-danger"
+                   th:if="${(row.animal.toBeVisited == null or !row.animal.toBeVisited)
+                and (row.visitor != null and row.visitor.userVisitor != null)}"
+                   th:href="@{/shelter/{iduser}/denyAnimalVisit/{idanim}(iduser=${id}, idanim=${row.animal.id})}">
+                    Deny visit
+                </a>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+    </div>
+</div>
+</body>
+</html>
